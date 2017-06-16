@@ -1,0 +1,208 @@
+---
+title: "jags_survival"
+author: "DLN"
+date: "June 15, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###############################################################################################
+######7. Estimation of survival from capture-recapture data using the Cormack-Jolly-Seber (CJS) model
+###############################################################################################
+
+```{r}
+library(stringr)
+library(R2WinBUGS)
+library(R2jags)
+
+library(tidyr)
+library(dplyr)
+
+setwd("C:/Users/MTHallworth/Documents/DESIREE/demography chickadees/demography analysis/JAGS")
+```
+#Data 
+```{r}
+## Upload Data
+## Chickadee Encounters
+       
+ch<-read.csv("C:/Users/MTHallworth/Documents/DESIREE/demography chickadees/demography analysis/data management/capturehistory_2017-03-01.csv",
+             colClasses = "character") %>%
+    mutate(bandnum=bandNumberQuery) %>%
+    mutate(ch=capture_history) %>%
+    select(site, bandnum,ch, years_seen)
+
+
+
+## Year Data
+year<-read.csv("C:/Users/MTHallworth/Documents/DESIREE/demography chickadees/demography analysis/csv/yearvalues_12feb2017.csv") %>%
+  select(year, peakcherry_juldate, average_wintertemp)
+
+## Body Condition
+bodycondition<-read.csv("C:/Users/MTHallworth/Documents/DESIREE/demography chickadees/demography analysis/bodycondition/CACH_bodycondition_2017-03-01.csv") %>%
+  mutate(site=site.x) %>%
+   select(bandnum, age, sex, condition)
+
+## Imperv
+#imperv<-read.csv("C:/Users/dnarango/Desktop/GIS SPATIAL LAYERS - IMPERV/Imperv_buffer_100_2017-03-01.csv") %>%
+#  mutate(site=id) %>%  
+#  select(site, per_imperv)
+    
+
+
+## Plants
+exotic<-read.csv("C:/Users/MTHallworth/Documents/DESIREE/demography chickadees/veg/plantorigin_IV- 2017-03-23.csv") %>%
+  select(site, exotic_tree,exotic_shrub) %>%
+  mutate(exotic_type=ifelse(exotic_tree>100,"exotic","native"))
+
+
+```
+Data Manipulation
+```{r message=FALSE}
+
+
+## Add Data Together
+survival<-ch %>%
+    #left_join(imperv, by="site") %>%
+    left_join(bodycondition, by="bandnum") %>%
+    left_join(exotic, by="site")
+          
+## Adds the mean where there are NAs
+#survival$per_imperv[is.na(survival$per_imperv)]<-mean(na.omit(survival$per_imperv))
+
+
+## Include only adults with known sex
+adults<-survival %>%
+        filter(age!="HY")%>%
+        filter(age!="L")%>%
+        filter(age!="U")%>%
+        filter(age!="ASY?") %>%
+        #filter(sex!="M?") %>%
+        #filter(sex!="UNK") %>%
+        #filter(sex!="U")
+        filter(exotic_tree!="NA")
+
+adults<-na.omit(adults)
+
+
+```
+
+Construct Matrix
+```{r}
+### need a matrix with x: capture year and y: individual
+
+#[,1] [,2] [,3] [,4] [,5] [,6]
+#[1,]    1    0    0    0    0    0
+#[2,]    1    0    0    0    0    0
+#[3,]    1    1    1    1    1    1
+#[4,]    1    1    0    0    0    0
+#[5,]    1    0    0    0    0    0
+#[6,]    1    1    0    0    1    0
+
+ch<-as.matrix(str_split_fixed(adults$ch, "", 15))
+
+class(ch) <- "numeric" 
+matrix<-ch
+
+## also need vector with marking occassion (year marked)
+get.first <- function(x) min(which(x!=0)) #make function
+VECTOR <- apply(matrix, 1, get.first)
+```
+
+######################################################################################
+#### BUGS
+
+A base model
+```{r}
+bugs.dir=("C:/Program Files (x86)/WinBUGS14")
+
+# Specify model in BUGS language
+sink("cjs-c-c.bug")
+cat("                          ##starts the bugs code
+    model {
+      
+# Priors and constraints
+      phi ~ dunif(0, 1)            ### Uniform priors  (could use: phi[i,t] <- mean.phi for mean survival)
+      p ~ dunif(0, 1)             ### Uniform priors
+      
+      
+      # Likelihood 
+      for (i in 1:nind){
+        # Define latent state at first capture
+        z[i,f[i]] <- 1
+        for (t in (f[i]+1):n.occasions){
+          
+          # State process
+          z[i,t] ~ dbern(mu1[i,t])
+          mu1[i,t] <- phi * z[i,t-1]		# Depends on whether ind was alive the time before
+          
+          # Observation process
+          y[i,t] ~ dbern(mu2[i,t])
+          mu2[i,t] <- p * z[i,t]			# Depends on the whether ind alive that time period
+        } #t
+      } #i
+    }
+    ",fill = TRUE)
+sink()
+
+# Bundle data
+bugs.data <- list(y = matrix, f = VECTOR, nind = nrow(matrix), n.occasions = ncol(matrix))
+
+# Function to create a matrix of initial values for latent state z
+ch.init <- function(ch, f){
+  for (i in 1:dim(ch)[1]){ch[i,1:f[i]] <- NA}
+  return(ch)
+}
+
+# Initial values
+inits <- function(){list(z = ch.init(matrix, VECTOR), phi = runif(1, 0, 1), p = runif(1, 0, 1))}
+
+# Parameters monitored
+parameters <- c("phi", "p")
+
+# MCMC settings
+ni <- 1000
+nt <- 6
+nb <- 500
+nc <- 3
+
+# Call WinBUGS from R (BRT 1 min)
+
+directory<-"C:/Users/MTHallworth/Documents/DESIREE/demography chickadees/demography analysis/BUGS code"
+
+cjs.c.c <- bugs(bugs.data, inits, parameters, "cjs-c-c.bug", n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb, debug = TRUE, bugs.directory = bugs.dir, working.directory = getwd())
+
+# Summarize posteriors
+print(cjs.c.c, digits = 3)
+```
+
+
+# To run in JAGS
+# In JAGS we have to give good initial values for the latent state z. At all occasions when an individual was 
+# observed, its state is z = 1 for sure. In addition, if an individual was not observed at an occasion, 
+#but was alive for sure, because it was observed before and thereafter (i.e. has a capture history of e.g. {101} 
+#or {10001}), then we know that the individual was alive at all of these occasions, and thus z = 1. 
+#Therefore, we should provide initial values of z = 1 at these positions as well. The following function 
+#provides such initial values from the observed capture histories:
+```{r}
+known.state.cjs <- function(ch){
+  state <- ch
+  for (i in 1:dim(ch)[1]){
+    n1 <- min(which(ch[i,]==1))
+    n2 <- max(which(ch[i,]==1))
+    state[i,n1:n2] <- 1
+    state[i,n1] <- NA
+  }
+  state[state==0] <- NA
+  return(state)
+}
+
+JAGS_inits <- function(){list(phi = runif(1, 0, 1), p = runif(1, 0, 1), z = known.state.cjs(matrix))}
+
+cjs.c.cJ <- jags(bugs.data, JAGS_inits, parameters, "cjs-c-c.bug", n.chains = nc, n.thin = nt, n.iter = ni, n.burnin = nb)
+
+# Summarize posteriors
+print(cjs.c.cJ, digits = 3)
+```
