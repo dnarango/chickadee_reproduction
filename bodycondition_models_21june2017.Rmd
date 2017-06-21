@@ -142,14 +142,20 @@ newdata$upper<-newdata$predict+newdata$CI
 
 library(ggplot2)
 
+## Mean values
+mean_bodycond<-bodycondition_data %>%
+                group_by(site, per_imperv,sex) %>%
+                summarise(mean_cond=mean(condition))
+
+
 graph<-ggplot(newdata, aes(x=per_imperv, y=predict, group=sex))+
                 geom_line(aes(color=sex), size=1) + 
                 geom_ribbon(aes(ymin=newdata$lower, ymax=upper), alpha=0.1)+
-                labs(x="% impervious surface", y="Body Condition") + 
+                labs(x="% impervious surface", y="Mean Body Condition") + 
                 geom_hline(yintercept = 0, linetype="dashed") + 
                     annotate("text", 6.5,0.6 , label = "Good Condition") + 
                     annotate("text", 6.5,-0.6 , label = "Poor Condition") + 
-                geom_point(data=bodycondition_data, aes(x=per_imperv, y=condition, color=sex), shape=19,alpha=0.1) 
+                geom_point(data=mean_bodycond, aes(x=per_imperv, y=mean_cond, color=sex), shape=19,alpha=0.1) 
 
 graph+ theme_minimal() + 
                        theme(axis.title = element_text(color="black", face="bold", size=14), 
@@ -159,4 +165,5 @@ graph+ theme_minimal() +
                              axis.ticks = element_line(size=0.5),
                              panel.background=element_rect(fill="white", colour = "white"),
                              panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+			     
 ```
