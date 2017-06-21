@@ -1,0 +1,162 @@
+---
+title: "Body Condition"
+author: "Desiree Narango"
+date: "June 21, 2017"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+  word_document: default
+---
+
+<img src="http://d2fbmjy3x0sdua.cloudfront.net/cdn/farfuture/pf_eSyQR23rURFfmMizmBYL_Do2IUdmBPpWTL_lDxSA/mtime:1486671315/sites/default/files/styles/nas_bird_teaser_illustration/public/4033_Sibl_9780307957900_art_r1.jpg?itok=NHph7TTI"alt="Alt text" style="width: 200px;"/>
+
+
+#Upload Data
+```{r, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+
+## Body Condition
+bodycondition<-read.csv("C:/Users/dnarango/Documents/Manuscripts/demography_exoticplants/Chapter 2 - demography/bodycondition/CACH_bodycondition_2017-03-01.csv") %>%
+  mutate(site=tolower(site.x))
+
+## Imperv
+imperv<-read.csv("C:/Users/dnarango/Desktop/GIS SPATIAL LAYERS - IMPERV/Imperv_buffer_100_2017-03-01.csv") %>%
+  mutate(site=id) %>%  
+  select(site, per_imperv)
+
+## Plants
+exotic<-read.csv("C:/Users/dnarango/Documents/Manuscripts/demography_exoticplants/veg/plantorigin_IV- 2017-03-23.csv") %>%
+  select(site, exotic_tree,exotic_shrub) %>%
+  mutate(exotic_type=ifelse(exotic_tree>100,"exotic","native"))
+
+bodycondition_data<-bodycondition %>%
+                    left_join(imperv, by="site") %>%
+                    left_join(exotic, by="site") %>%
+                    filter(exotic_tree!="NA") %>%
+                    mutate(total_exotic=(exotic_tree+exotic_shrub)/400) %>%
+                    mutate(year=as.numeric(substr(date.x, 1, 4))) %>%
+                    mutate(tmp=as.Date(date.x)) %>%
+                    mutate(juldate=as.numeric(format(tmp,"%j"))) %>%
+                    filter(wing.x!=".") %>%
+                    mutate(wing=as.numeric(as.character(wing.x))) %>%
+                    filter(wing<71)  %>% ## All values >70 are wrong
+                    mutate(mass.x=as.character(mass.x))%>%
+                    mutate(mass=ifelse(mass.x==".","NA",mass.x)) %>%
+                    filter(age!="L") %>%
+                    filter(sex=="M"|sex=="F")
+
+males_body<-bodycondition_data %>%
+              filter(sex=="M") %>%
+            filter(mass!="NA")
+
+#cond_model<-lm(mass~wing+juldate, data=males_body)
+#summary(cond_model)
+#males_body$condition2<-cond_model$residuals
+
+females_body<-bodycondition_data %>%
+              filter(sex=="F")%>%
+            filter(mass!="NA")
+
+#cond_model<-lm(mass~wing, data=females_body)
+#summary(cond_model)
+#females_body$condition2<-cond_model$residuals
+
+
+```
+#Body Size Model
+```{r, message=FALSE}
+
+library(nlme)
+library(lme4)
+library(lmerTest)
+
+## Mixed model running from package nlme
+## random effect: site
+
+
+bodysize_model <- lme(wing~total_exotic+per_imperv+sex, 
+	random =list(~ 1|year, ~1|site), method = "REML", na.action="na.omit",data=bodycondition_data)
+
+summary(bodysize_model)
+anova.lme(bodysize_model, type = "marginal", adjustSigma = F)
+intervals(bodysize_model)
+
+
+## Just males
+bodysize_model_male <- lme(wing~total_exotic+per_imperv, 
+	random =list(~ 1|year, ~1|site), method = "REML", na.action="na.omit",data=males_body)
+
+summary(bodysize_model_male)
+anova.lme(bodysize_model_male, type = "marginal", adjustSigma = F)
+intervals(bodysize_model_male)
+
+## Just females
+bodysize_model_female <- lme(wing~total_exotic+per_imperv, 
+	random =list(~ 1|year, ~1|site), method = "REML", na.action="na.omit",data=females_body)
+
+summary(bodysize_model_female)
+anova.lme(bodysize_model_female, type = "marginal", adjustSigma = F)
+intervals(bodysize_model_female)
+
+##lmer
+body_lmer <- lmer(wing ~ total_exotic + per_imperv+sex +(1|year) +(1|site), bodycondition_data)
+summary(body_lmer)
+confint(body_lmer)
+
+#lm
+body_lm <- lm(wing ~ total_exotic + per_imperv+sex, bodycondition_data)
+summary(body_lm)
+confint(body_lm)
+```
+#Body Condition
+```{r}
+##lmer
+library(lmerTest)
+
+condition_lm <- lm(condition ~ total_exotic+sex+per_imperv, bodycondition_data)
+summary(condition_lm)
+confint(condition_lm)
+
+
+```
+#Graphs
+```{r}
+newdata<- data.frame(total_exotic=0, per_imperv=rep(seq(0,100,by=1),2), sex=rep(c("M","F"),each=101))
+
+newdata$predict<-predict(condition_lm,newdata=newdata,type="response",se.fit=FALSE,level = 0)
+z<-predict(condition_lm,newdata=newdata, type="response",se.fit=TRUE)
+
+se.CI <- z$se.fit
+alpha <- qt((1-0.95)/2, df = z$df)
+#CI <- z$fit + c(alpha, -alpha) * se.CI
+
+newdata$se.CI<-se.CI
+newdata$CI<- 1.96*newdata$se.CI
+newdata$lower<-newdata$predict-newdata$CI
+newdata$upper<-newdata$predict+newdata$CI
+
+
+library(ggplot2)
+
+graph<-ggplot(newdata, aes(x=per_imperv, y=predict, group=sex))+
+                geom_line(aes(color=sex), size=1) + 
+                geom_ribbon(aes(ymin=newdata$lower, ymax=upper), alpha=0.1)+
+                labs(x="% impervious surface", y="Body Condition") + 
+                geom_hline(yintercept = 0, linetype="dashed") + 
+                    annotate("text", 6.5,0.6 , label = "Good Condition") + 
+                    annotate("text", 6.5,-0.6 , label = "Poor Condition") + 
+                geom_point(data=bodycondition_data, aes(x=per_imperv, y=condition, color=sex), shape=19,alpha=0.1) 
+
+graph+ theme_minimal() + 
+                       theme(axis.title = element_text(color="black", face="bold", size=14), 
+                             axis.text.y = element_text(face="bold", color="gray50", size=9),
+                             axis.line.x = element_line(colour = "#666666", size=1), 
+                             axis.line.y = element_line(colour = "#666666", size=1),
+                             axis.ticks = element_line(size=0.5),
+                             panel.background=element_rect(fill="white", colour = "white"),
+                             panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+```
