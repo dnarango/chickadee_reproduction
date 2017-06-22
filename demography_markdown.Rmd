@@ -60,7 +60,7 @@ Carolina chickadees, are non-migratory, synchronous breeding songbirds that are 
 Chickadees are also well suited for this study because they are primarily insectivorous despite persisting in urban landscapes (Mostrom et al. 2002) During the breeding season, invertebrates represent >90% of their diet (Martin and Zim 1951, Narango et al. unpublished data). In the non-breeding season, chickadees will switch to a diet that includes plant material, however, because invertebrates still maintain 30-50% of the diet in the fall-winter (Martin and Zim 1951, Narango et al. unpublished data), animal-based food may have important implications for annual survival. In all seasons, herbivorous lepidopteran larvae are a disproportionately important food item relative to other invertebrate taxa (Narango et al. unpublished data) and herbivorous arthropod taxa are negatively impacted by reductions in host plant availability (Narango et al. 2017). 
 
 ##*Reproduction.*
-From 2013-2016, nest boxes were monitored from April-June by primarily homeowner volunteers. Homeowners were trained in nest box monitoring protocol by technicians and submitted data to the project through a web-based application over the season. Nest boxes were checked approximately once per week and presence of a nest, number of eggs and number of nestlings were recorded. Clutch and brood size accuracy were also confirmed by trained technicians visiting the site at least once during the active nest. Following successful completion of the nest, boxes were checked once more for any deceased nestlings. If predation took place, evidence of the culprit (e.g. competitor nest material, damage to the nest) was recorded. Each site was assigned whether a nest was present (binary), clutch completion date, total eggs laid, total eggs hatched, whether it was successful (binary) and total number of young produced. If a nest was not present in the nest box, technicians searched the site area in order to monitor nests occurring in natural cavities or adjacent properties. 
+From 2013-2016, nest boxes were monitored from April-June by primarily homeowner volunteers. Homeowners were trained in nest box monitoring protocol by technicians and submitted data to the project through a web-based application over the season. Nest boxes were checked approximately once per week and presence of a nest, number of eggs and number of nestlings were recorded. If a nest was not present in the nest box, technicians also searched the site area in order to monitor nests occurring in natural cavities or adjacent properties. Clutch and brood size accuracy were also confirmed by trained technicians visiting the site at least once during the active nest. Following successful completion of the nest, boxes were checked once more for any deceased nestlings. If predation took place, evidence of the culprit (e.g. competitor nest material, damage to the nest) was recorded. Each site was assigned whether a nest was present (binary), clutch completion date, total eggs laid, total eggs hatched, whether it was successful (binary), total number of young produced and nestling period (days to fledge).  
 
 ##*Survival. *
 We quantified yearly survival using a 2000-2016 dataset on color-banded chickadees (see Evans et al 2015 for additional information). Sites were visited at least once yearly between April-August in order to color-band chickadees and resight returning individuals.  Birds were captured opportunistically using mist nets and conspecific playback or capture of breeding individuals at the nest box. Individuals are marked with a unique combination of colored plastic bands, as well as a US Fish and Wildlife Service aluminum band. All birds were aged using plumage characteristics and skull ossification and sexed via breeding evidence. We also measured wing chord for body size and weighed to the nearest 0.01g.  During the visit, technicians systematically covered a 200m radius area (12.6 Ha) in order to resight previously captured individuals that were not present in the focal yard. Homeowners were also instructed to report observations of color-banded individuals throughout the year.
@@ -87,6 +87,8 @@ Between 2013 and 2016, we collected plant data from 160 different sites that wer
 ##*Reproduction.* 
 Our aster models revealed that reproductive success, defined as number of young fledged, declined as non-native plants increased dominance within the yard (?? -0.30±0.06, p<0.001, figure 2). At each conditional level, non-native plants had a negative effect on the probability of chickadee settlement (?? -2.97±0.63, p<0.001), the probability of nesting (?? -1.73±0.79, p=0.02), and the number of eggs laid (?? -0.49±0.23, p=0.03). There was no effect of non-native plants on nest success (?? -1.06±1.06, p>0.1); however, an increase in non-native shrubs also increased the probability of house wren yard occupancy (model-averaged ?? 0.71 ± 0.36, CI: 0.02, 1.41), which is the most frequent nest competitor in this system. 
 
+
+
 ##Body Size and Condition
 There was no effect of either non-native plants (beta: -0.18 ± 0.84, CI: -1.87,1.47) or percent impervious surface (beta: 0.00 ± 0.01, CI: -0.02, 0.03) on the body size of chickadees when accounting for sex. However, males were larger than females (beta: 2.23 ± 0.19, CI: 1.85, 2.61). There was a modest tendency for chickadees to be in poorer condition as impervious surface increased (beta: -0.01 ± 0.00, CI:-0.01,0.00), and males tended to be in better condition than females (beta: 0.28 ± 0.07, CI: 0.14, 0.42). There was no effect of non-native plants on condition (beta: -0.31 ± 0.32, CI:-0.93,0.30)
 
@@ -104,11 +106,9 @@ Our work adds to the growing body of evidence that native plants are better at p
 
 Our results suggest that non-native plants reduce the reproductive potential of an insectivorous bird via bottom-up effects on territory quality. Although there was no effect on nest success, non-native plants also have the potential to influence top-down predation by increasing interactions with nest competitors. Non-native landscaping appears to contribute to the paucity of insectivores that occupy urban areas because these yards are unsuitable for supporting breeding and producing eggs. Homeowners prioritizing wildlife habitat should plant and retain native plants to encourage positive growth in insectivorous bird populations.
 
-One way that birds may cope with changes in food availability is to switch to alternative food types. Degraded habitat may reduce the availability of certain trophic niches and trophic flexibility may predict the occurrence of bird species in degraded habitats (Edwards et al. 2013). Although granivorous and omnivorous birds are more likely to persist in urban areas, most of these species also require arthropods during the breeding season.
-
-Non-native plants support fewer herbivorous insects, but may have other guilds, such as generalist predators, which could facilitate a switch in food types. However, if both guilds are impacted by plant availability (Haddad et al. 2009), birds may switch to feed on plant-based and supplementary food types which may decrease seasonal fitness (Plummer et al. 2013; but see Robb et al. 2008). Quantifying the degree to which birds use different available resources may help elucidate the drivers behind reproductive variation in urban areas.
+One way that birds may cope with changes in food availability is to switch to alternative food types. Degraded habitat may reduce the availability of certain trophic niches and trophic flexibility may predict the occurrence of bird species in degraded habitats (Edwards et al. 2013). Although granivorous and omnivorous birds are more likely to persist in urban areas, most of these species also require arthropods during the breeding season. Non-native plants support fewer herbivorous insects, but may have other guilds, such as generalist predators, which could facilitate a switch in food types. However, if both guilds are impacted by plant availability (Haddad et al. 2009), birds may switch to feed on plant-based and supplementary food types which may decrease seasonal fitness (Plummer et al. 2013; but see Robb et al. 2008). Quantifying the degree to which birds use different available resources may help elucidate the drivers behind reproductive variation in urban areas.
 	 
-
+With the world urbanizing at a rapid pace, it's imperative that we consider the potential for underutalized developed areas to support wildlife populations (Rega-brodsky and Nilon 2016). Residential properties cover X% of North america that could be used as habitat for some breeding birds. However, we show that plant quality can have important implications in the ability of a yard to support sustainably populations. 
 
 #REFERENCES
 
@@ -147,35 +147,7 @@ The Potential Conservation Value of Non-Native Species
 #FIGURES AND TABLES
 
 
-Table 2. Mean ± SD of reproductive rates in native and non-native sites
-	Native	Non-native
-Probability of Nesting		
-Clutch completion (Julian Date)		
-Clutch Size		
-Hatch Number		
-Nest Survival		
-Fledge Number		
-
-
-Table 2. Sample sizes of female and male color-banded chickadees in native and non-native sites
-	Females	Males	Unknown
-# of Captures	222	248	389
-# of Resights			
-
-
-Figure 1. A graphical model of the relationship between reproductive successes for each component in the Aster Model. Reproduction failure in earlier components of the model are represented in later nodes, i.e. if chickadees failed to nest within a yard, that territory had zero eggs and zero fledged young.  We defined reproductive success as the number of young fledged. 
-
- 
-
-
-
-
-Figure 2. Predicted relationship between Carolina chickadee reproductive success and dominance of non-native trees for each year. Number of fledged young declined as non-native plants increased in the yard. Gray ribbon represents the 95% confidence interval.
-
- 
-
-Figure 3. Exotic plant dominance had a significant negative effect on settlement, breeding, and # of eggs (not pictured). There was no effect on nest survival.
- 
+See attached file
 
 #JUNK
 Hypothetical Path Analysis for Survival: 
